@@ -15,9 +15,22 @@ function grid_posts_shortcode($atts) {
 			'posts_per_page' => intval($atts['posts_per_page']),
 			'category_name' => sanitize_text_field($atts['category']),
 		);
+
+        if(isset($_POST['submit_name'])) {
+            $args1 = array(
+                'meta_key' => 'product_name',
+                'meta_value' => $_POST['product_name'],
+                'meta_compare' => 'LIKE'
+            );
+            $args = array_merge($args, $args1);
+        }
 	
 		$query = new WP_Query($args);
 		$output = '<div class="grid-posts-container" style="display: grid; grid-template-columns: repeat(3, minmax(200px, 1fr)); gap: 20px;">';
+        $output .= '<form method="post">
+            <input type="text" name="product_name">
+            <input type="submit" name="submit_name" value="Search">
+            </form>';
 	
 		// 포스트 출력
 		if ($query->have_posts()) {
