@@ -66,20 +66,31 @@ function grid_posts_shortcode($atts) {
 add_shortcode('grid_posts', 'grid_posts_shortcode');
 
 function display_user_list() {
-    $users = get_users();
+    $args = array(
+        'search' => 'kimkyungtae72',
+        'search_columns' => 'user_nicename'
+    );
+    //$users = get_users();
+    $users = new WP_User_Query( $args );
     $output = '<table>';
     $output .= '<tr><th>이름</th><th>이메일</th><th>역할</th><th>액션</th></tr>';
     $rownum = 0;
-    foreach ($users as $user) {
-        $output .= '<tr name = ' . $rownum .'>';
-        $output .= '<td class="user-name">' . esc_html($user->display_name) . '</td>';
-        $output .= '<td class="user-email">' . esc_html($user->user_email) . '</td>';
-        $output .= '<td class="user-role">' . esc_html(implode(', ', $user->roles)) . '</td>';
-        $output .= '<td><a href="?page_id=269&user_id=' . $user->ID . '">수정</a>';
-        $output .= '<a href="?action=delete_user&user_id=' . $user->ID . '" onclick="return confirm(\'정말 삭제하시겠습니까?\')">삭제</a></td>';
-        $output .= '</tr>';
+    if (!empty( $users->get_results())) {
+        foreach ($users->get_results() as $user) {
+            $output .= '<tr name = ' . $rownum .'>';
+            $output .= '<td class="user-name">' . esc_html($user->display_name) . '</td>';
+            $output .= '<td class="user-email">' . esc_html($user->user_email) . '</td>';
+            $output .= '<td class="user-role">' . esc_html(implode(', ', $user->roles)) . '</td>';
+            $output .= '<td><a href="?page_id=269&user_id=' . $user->ID . '">수정</a>';
+            $output .= '<a href="?action=delete_user&user_id=' . $user->ID . '" onclick="return confirm(\'정말 삭제하시겠습니까?\')">삭제</a></td>';
+            $output .= '</tr>';
+        }
+        $output .= '</table>';
+    } else {
+        $output .= '<tr><td>No users found.</td></tr>';
+        $output .= '</table>';
     }
-    $output .= '</table>';
+    
     return $output;
 }
 add_shortcode('user_list', 'display_user_list');
